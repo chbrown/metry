@@ -1,0 +1,34 @@
+{
+  "name": "metry",
+  "description": "Metrics database and API",
+  "keywords": [
+    "metrics"
+  ],
+  "version": "0.0.1",
+  "homepage": "https://github.com/chbrown/metry",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chbrown/metry.git"
+  },
+  "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
+  "license": "MIT",
+  "dependencies": {
+    "async": "*",
+    "lodash": "*",
+    "loge": "*",
+    "http-enhanced": "*",
+    "moment": "*",
+    "regex-router": "*",
+    "sqlcmd-pg": "*",
+    "yargs": "*"
+  },
+  "devDependencies": {
+    "typescript": "next"
+  },
+  "bin": {
+    "metry": "bin/metry"
+  },
+  "scripts": {
+    "start": "node bin/metry"
+  }
+}
