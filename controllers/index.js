@@ -1,10 +1,16 @@
+/// <reference path="../type_declarations/index.d.ts" />
+var loge_1 = require('loge');
 var Router = require('regex-router');
-// var send = require('send');
 var package_json = require('../package.json');
 var actionsController = require('./actions');
 var actiontypesController = require('./actiontypes');
 var R = new Router(function (req, res, m) {
     res.end("index: URL not found: " + req.url);
+});
+R.options(/^\//, function (req, res, m) {
+    loge_1.logger.debug('Responding to OPTIONS /*');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
+    res.end();
 });
 R.any(/^\/actions/, actionsController);
 R.any(/^\/actiontypes/, actiontypesController);

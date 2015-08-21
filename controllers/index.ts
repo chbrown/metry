@@ -2,8 +2,6 @@
 import {logger} from 'loge';
 import Router = require('regex-router');
 
-// var send = require('send');
-
 var package_json = require('../package.json');
 
 var actionsController = require('./actions');
@@ -11,6 +9,12 @@ var actiontypesController = require('./actiontypes');
 
 var R = new Router((req, res: any, m) => {
   res.end(`index: URL not found: ${req.url}`);
+});
+
+R.options(/^\//, (req, res, m) => {
+  logger.debug('Responding to OPTIONS /*');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
+  res.end();
 });
 
 R.any(/^\/actions/, actionsController);
