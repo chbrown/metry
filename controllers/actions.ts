@@ -1,4 +1,5 @@
 /// <reference path="../type_declarations/index.d.ts" />
+import _ = require('lodash');
 import {logger} from 'loge';
 import Router = require('regex-router');
 import {db} from '../database';
@@ -13,9 +14,7 @@ var R = new Router((req, res: any, m) => {
 List all actions.
 */
 R.get(/^\/actions($|\?)/, (req, res: any) => {
-  db.Select('action')
-  .add('DISTINCT ON(action_id) *')
-  .orderBy('action_id, entered DESC')
+  db.Select('distinct_action')
   .where('deleted IS NULL')
   .execute((err, actions) => {
     if (err) return res.die(err);
@@ -31,18 +30,18 @@ R.get(/^\/actions\/new$/, (req, res: any) => {
 });
 
 /** POST /actions
-    POST /actions/:id
+    POST /actions/
+    POST /actions/:action_id
 Create / update action.
 It's basically the same thing since the `action` table is immutable.
 */
-R.post(/^\/actions(?:$|\/(\d+))/, (req: any, res: any, m) => {
+R.post(/^\/actions(?:\/(\d+)?)?$/, (req: any, res: any, m) => {
   req.readData(function(err, data) {
     if (err) return res.die(err);
 
     var fields = _.pick(data, action_columns);
-    if (m[1]) {
-      fields['id'] = m[1];
-    }
+    // the action_id supplied in the URL should override the payload, even if undefined
+    fields['action_id'] = m[1];
 
     db.InsertOne('action')
     .set(fields)
@@ -54,12 +53,12 @@ R.post(/^\/actions(?:$|\/(\d+))/, (req: any, res: any, m) => {
   });
 });
 
-/** GET /actions/:id
+/** GET /actions/:action_id
 Show existing action.
 */
 R.get(/^\/actions\/(\d+)$/, (req, res: any, m) => {
   db.SelectOne('action')
-  .whereEqual({id: m[1]})
+  .whereEqual({action_id: m[1]})
   .orderBy('entered DESC')
   .where('deleted IS NULL')
   .execute((err, action) => {
@@ -73,7 +72,7 @@ Delete existing action.
 */
 R.delete(/^\/actions\/(\d+)$/, (req, res: any, m) => {
   db.Insert('action')
-  .set({id: m[1], deleted: new Date()})
+  .set({action_id: m[1], deleted: new Date()})
   .execute((err) => {
     if (err) return res.die(err);
     res.status(204).end();
