@@ -4,20 +4,20 @@ import {logger} from 'loge';
 import Router = require('regex-router');
 import {db} from '../database';
 
-const actiontype_columns = ['actiontype_id', 'name', 'view_order', 'archived', 'created'];
+const actiontype_columns = ['actiontype_id', 'name', 'view_order', 'archived', 'deleted'];
 
-var R = new Router((req, res: any, m) => {
-  res.die(`actiontypes: URL not found: ${req.url}`);
-});
+var R = new Router();
 
 /** GET /actiontypes
 List all actiontypes.
 */
 R.get(/^\/actiontypes($|\?)/, (req, res: any) => {
-  db.Select('actiontype')
-  .execute((err, rows) => {
+  db.Select('distinct_actiontype')
+  .where('deleted IS NULL')
+  .orderBy('view_order ASC, actiontype_id ASC')
+  .execute((err, actiontypes) => {
     if (err) return res.die(err);
-    res.json(rows);
+    res.json(actiontypes);
   });
 });
 
@@ -25,17 +25,21 @@ R.get(/^\/actiontypes($|\?)/, (req, res: any) => {
 Generate blank actiontype.
 */
 R.get(/^\/actiontypes\/new$/, (req, res: any) => {
-  res.json({created: new Date()});
+  res.json({entered: new Date()});
 });
 
 /** POST /actiontypes
-Create new actiontype.
+    POST /actiontypes/
+    POST /actiontypes/:actiontype_id
+Create / update actiontypes.
+It's basically the same thing since the `actiontype` table is immutable.
 */
-R.post(/^\/actiontypes($|\?)/, (req: any, res: any) => {
-  req.readData((err, data) => {
+R.post(/^\/actiontypes(?:\/(\d+)?)?$/, (req: any, res: any, m) => {
+  req.readData(function(err, data) {
     if (err) return res.die(err);
 
     var fields = _.pick(data, actiontype_columns);
+    fields['actiontype_id'] = m[1];
 
     db.InsertOne('actiontype')
     .set(fields)
@@ -47,53 +51,29 @@ R.post(/^\/actiontypes($|\?)/, (req: any, res: any) => {
   });
 });
 
-/** GET /actiontypes/:id
+/** GET /actiontypes/:actiontype_id
 Show existing actiontype.
 */
 R.get(/^\/actiontypes\/(\d+)$/, (req, res: any, m) => {
-  db.SelectOne('actiontype')
-  .whereEqual({id: m[1]})
+  db.SelectOne('distinct_actiontype')
+  .whereEqual({actiontype_id: m[1]})
+  .where('deleted IS NULL')
   .execute((err, actiontype) => {
     if (err) return res.die(err);
     res.json(actiontype);
   });
 });
 
-/** POST /actiontypes
-Update existing actiontype.
-*/
-R.post(/^\/actiontypes\/(\d+)/, (req: any, res: any, m) => {
-  req.readData((err, data) => {
-    if (err) return res.die(err);
-
-    var fields = _.pick(data, actiontype_columns);
-
-    db.Update('actiontype')
-    .setEqual(fields)
-    .whereEqual({id: m[1]})
-    .returning('*')
-    .execute((err, rows) => {
-      if (err) return res.die(err);
-      res.status(201).json(rows[0]);
-    });
-  });
-});
-
-/** DELETE /actiontypes/:id
+/** DELETE /actiontypes/:actiontype_id
 Delete existing actiontype.
 */
 R.delete(/^\/actiontypes\/(\d+)$/, (req, res: any, m) => {
-  db.Delete('actiontype')
-  .whereEqual({id: m[1]})
+  db.Insert('actiontype')
+  .set({actiontype_id: m[1], deleted: new Date()})
   .execute((err) => {
     if (err) return res.die(err);
     res.status(204).end();
   });
 });
 
-function route(req, res) {
-  logger.debug('actiontypes routing: ', req.method, req.url);
-  R.route(req, res);
-}
-export = route;
-// export = R.route.bind(R);
+export = R.route.bind(R);

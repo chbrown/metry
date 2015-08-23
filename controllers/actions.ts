@@ -4,11 +4,9 @@ import {logger} from 'loge';
 import Router = require('regex-router');
 import {db} from '../database';
 
-const action_columns = ['action_id', 'actiontype_id', 'started', 'ended', 'deleted', 'entered'];
+const action_columns = ['action_id', 'actiontype_id', 'started', 'ended', 'deleted'];
 
-var R = new Router((req, res: any, m) => {
-  res.die(`actions: URL not found: ${req.url}`);
-});
+var R = new Router();
 
 /** GET /actions
 List all actions.
@@ -67,7 +65,7 @@ R.get(/^\/actions\/(\d+)$/, (req, res: any, m) => {
   });
 });
 
-/** DELETE /actions/:id
+/** DELETE /actions/:action_id
 Delete existing action.
 */
 R.delete(/^\/actions\/(\d+)$/, (req, res: any, m) => {

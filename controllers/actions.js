@@ -2,10 +2,8 @@
 var _ = require('lodash');
 var Router = require('regex-router');
 var database_1 = require('../database');
-var action_columns = ['action_id', 'actiontype_id', 'started', 'ended', 'deleted', 'entered'];
-var R = new Router(function (req, res, m) {
-    res.die("actions: URL not found: " + req.url);
-});
+var action_columns = ['action_id', 'actiontype_id', 'started', 'ended', 'deleted'];
+var R = new Router();
 /** GET /actions
 List all actions.
 */
@@ -61,7 +59,7 @@ R.get(/^\/actions\/(\d+)$/, function (req, res, m) {
         res.json(action);
     });
 });
-/** DELETE /actions/:id
+/** DELETE /actions/:action_id
 Delete existing action.
 */
 R.delete(/^\/actions\/(\d+)$/, function (req, res, m) {
