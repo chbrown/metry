@@ -10,21 +10,25 @@ CREATE FUNCTION prohibit_update_and_delete() RETURNS trigger AS
 -- tables
 
 CREATE TABLE actiontype (
-  actiontype_id SERIAL PRIMARY KEY,
-
-  name TEXT NOT NULL,
+  actiontype_id SERIAL,
+  name TEXT,
   view_order INTEGER DEFAULT 0 NOT NULL,
-
   archived BOOLEAN DEFAULT FALSE NOT NULL,
-  created TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp NOT NULL
+
+  deleted TIMESTAMP WITH TIME ZONE,
+  entered TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp NOT NULL,
+
+  CONSTRAINT actiontype_check CHECK ((deleted IS NOT NULL) OR (name IS NOT NULL))
 );
+CREATE VIEW distinct_actiontype AS
+  SELECT DISTINCT ON(actiontype_id) * FROM actiontype ORDER BY actiontype_id, entered DESC;
 
 CREATE TABLE action (
   action_id SERIAL,
-  actiontype_id INTEGER REFERENCES actiontype(actiontype_id), -- ON DELETE CASCADE
-
+  actiontype_id INTEGER, -- REFERENCES distinct_actiontype(actiontype_id)
   started TIMESTAMP WITH TIME ZONE,
   ended TIMESTAMP WITH TIME ZONE,
+
   deleted TIMESTAMP WITH TIME ZONE,
   entered TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp NOT NULL,
 
