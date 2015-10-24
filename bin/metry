@@ -2,7 +2,7 @@
 var path = require('path');
 var loge = require('loge');
 
-var db = require('../database').db;
+var db = require('../database').default;
 var server = require('../server');
 
 var yargs = require('yargs')

@@ -13,7 +13,6 @@
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "license": "MIT",
   "dependencies": {
-    "async": "*",
     "lodash": "*",
     "loge": "*",
     "http-enhanced": "*",
