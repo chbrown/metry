@@ -1,10 +1,9 @@
-/// <reference path="../type_declarations/index.d.ts" />
 var loge_1 = require('loge');
-var Router = require('regex-router');
+var regex_router_1 = require('regex-router');
 var package_json = require('../package.json');
 var actionsController = require('./actions');
 var actiontypesController = require('./actiontypes');
-var R = new Router(function (req, res, m) {
+var R = new regex_router_1.default(function (req, res, m) {
     res.end("index: URL not found: " + req.url);
 });
 R.options(/^\//, function (req, res, m) {

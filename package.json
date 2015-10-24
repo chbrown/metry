@@ -1,10 +1,10 @@
 {
   "name": "metry",
+  "version": "0.0.4",
   "description": "Metrics database and API",
   "keywords": [
     "metrics"
   ],
-  "version": "0.0.4",
   "homepage": "https://github.com/chbrown/metry",
   "repository": {
     "type": "git",

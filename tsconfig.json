@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES5"
+  },
+  "files": [
+    "type_declarations/DefinitelyTyped/lodash/lodash.d.ts",
+    "type_declarations/DefinitelyTyped/moment/moment-node.d.ts",
+    "type_declarations/DefinitelyTyped/node/node.d.ts",
+    "controllers/index.ts",
+    "controllers/actions.ts",
+    "controllers/actiontypes.ts",
+    "database.ts",
+    "server.ts"
+  ]
+}

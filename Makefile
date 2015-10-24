@@ -1,7 +1,7 @@
 BIN := node_modules/.bin
 DTS := lodash/lodash moment/moment-node node/node
 
-all: type_declarations
+all: server.js
 
 type_declarations: $(DTS:%=type_declarations/DefinitelyTyped/%.d.ts)
 type_declarations/DefinitelyTyped/%:
@@ -12,4 +12,4 @@ $(BIN)/tsc:
 	npm install
 
 %.js: %.ts type_declarations $(BIN)/tsc
-	$(BIN)/tsc -m commonjs -t ES5 $<
+	$(BIN)/tsc

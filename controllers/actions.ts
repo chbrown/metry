@@ -1,8 +1,7 @@
-/// <reference path="../type_declarations/index.d.ts" />
-import _ = require('lodash');
+import {pick} from 'lodash';
 import {logger} from 'loge';
-import Router = require('regex-router');
-import {db} from '../database';
+import Router from 'regex-router';
+import db from '../database';
 
 const action_columns = ['action_id', 'actiontype_id', 'started', 'ended', 'deleted'];
 
@@ -37,7 +36,7 @@ R.post(/^\/actions(?:\/(\d+)?)?$/, (req: any, res: any, m) => {
   req.readData(function(err, data) {
     if (err) return res.die(err);
 
-    var fields = _.pick(data, action_columns);
+    var fields = pick(data, action_columns);
     // the action_id supplied in the URL should override the payload, even if undefined
     fields['action_id'] = m[1];
 

@@ -1,4 +1,3 @@
-/// <reference path="type_declarations/index.d.ts" />
 var http = require('http-enhanced');
 var loge_1 = require('loge');
 var indexController = require('./controllers/index');

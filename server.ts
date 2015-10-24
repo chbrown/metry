@@ -1,4 +1,3 @@
-/// <reference path="type_declarations/index.d.ts" />
 var http = require('http-enhanced');
 import {logger} from 'loge';
 

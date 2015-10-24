@@ -1,8 +1,7 @@
-/// <reference path="../type_declarations/index.d.ts" />
-import _ = require('lodash');
+import {pick} from 'lodash';
 import {logger} from 'loge';
-import Router = require('regex-router');
-import {db} from '../database';
+import Router from 'regex-router';
+import db from '../database';
 
 const actiontype_columns = ['actiontype_id', 'name', 'view_order', 'archived', 'deleted'];
 
@@ -38,7 +37,7 @@ R.post(/^\/actiontypes(?:\/(\d+)?)?$/, (req: any, res: any, m) => {
   req.readData(function(err, data) {
     if (err) return res.die(err);
 
-    var fields = _.pick(data, actiontype_columns);
+    var fields = pick(data, actiontype_columns);
     fields['actiontype_id'] = m[1];
 
     db.InsertOne('actiontype')
