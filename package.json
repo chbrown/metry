@@ -22,6 +22,7 @@
     "yargs": "*"
   },
   "devDependencies": {
+    "declarations": "*",
     "typescript": "next"
   },
   "bin": {
