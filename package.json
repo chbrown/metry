@@ -13,17 +13,15 @@
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "license": "MIT",
   "dependencies": {
-    "lodash": "*",
     "loge": "*",
-    "http-enhanced": "*",
     "moment": "*",
-    "regex-router": "*",
+    "restify": "*",
     "sqlcmd-pg": "*",
     "yargs": "*"
   },
   "devDependencies": {
     "declarations": "*",
-    "typescript": "next"
+    "typescript": "*"
   },
   "bin": {
     "metry": "bin/metry"

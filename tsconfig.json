@@ -7,9 +7,7 @@
     "node_modules/declarations/lodash/lodash.d.ts",
     "node_modules/declarations/moment/moment-node.d.ts",
     "node_modules/declarations/node/node.d.ts",
-    "controllers/index.ts",
-    "controllers/actions.ts",
-    "controllers/actiontypes.ts",
+    "node_modules/declarations/restify/restify.d.ts",
     "database.ts",
     "server.ts"
   ]
