@@ -13,9 +13,9 @@
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "license": "MIT",
   "dependencies": {
-    "loge": "*",
     "moment": "*",
     "restify": "*",
+    "sql-patch": "*",
     "sqlcmd-pg": "*",
     "yargs": "*"
   },

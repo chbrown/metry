@@ -1,5 +1,11 @@
 var restify_1 = require('restify');
-var database_1 = require('./database');
+var sqlcmd_pg_1 = require('sqlcmd-pg');
+exports.db = new sqlcmd_pg_1.Connection({
+    host: '127.0.0.1',
+    port: '5432',
+    user: 'postgres',
+    database: 'metry',
+});
 var package_json = require('./package.json');
 exports.app = restify_1.createServer();
 exports.app.use(restify_1.CORS());
@@ -46,7 +52,7 @@ exports.app.get('info', function (req, res, next) {
 List all actions.
 */
 exports.app.get('actions', function (req, res, next) {
-    var select = database_1.default.Select('distinct_action').where('deleted IS NULL');
+    var select = exports.db.Select('distinct_action').where('deleted IS NULL');
     var start = parseDate(req.params.start);
     if (start) {
         select = select.where('started > ?', start);
@@ -75,7 +81,7 @@ exports.app.post('actions/:action_id', function (req, res, next) {
     // if it's the empty string, use undefined instead
     var action_id = req.params.action_id || undefined;
     var _a = req.body, actiontype_id = _a.actiontype_id, started = _a.started, ended = _a.ended, deleted = _a.deleted;
-    database_1.default.InsertOne('action')
+    exports.db.InsertOne('action')
         .set({ action_id: action_id, actiontype_id: actiontype_id, started: started, ended: ended, deleted: deleted })
         .returning('*')
         .execute(sendCallback(res, next)); // HTTP 201
@@ -84,7 +90,7 @@ exports.app.post('actions/:action_id', function (req, res, next) {
 Show existing action.
 */
 exports.app.get('actions/:action_id', function (req, res, next) {
-    database_1.default.SelectOne('action')
+    exports.db.SelectOne('action')
         .whereEqual({ action_id: req.params.action_id })
         .orderBy('entered DESC')
         .where('deleted IS NULL')
@@ -94,7 +100,7 @@ exports.app.get('actions/:action_id', function (req, res, next) {
 Delete existing action.
 */
 exports.app.del('actions/:action_id', function (req, res, next) {
-    database_1.default.Insert('action')
+    exports.db.Insert('action')
         .set({ action_id: req.params.action_id, deleted: new Date() })
         .execute(sendCallback(res, next)); // HTTP 204
 });
@@ -105,7 +111,7 @@ exports.app.del('actions/:action_id', function (req, res, next) {
 List all actiontypes.
 */
 exports.app.get('actiontypes', function (req, res, next) {
-    database_1.default.Select('distinct_actiontype')
+    exports.db.Select('distinct_actiontype')
         .where('deleted IS NULL')
         .orderBy('view_order ASC, actiontype_id ASC')
         .execute(sendCallback(res, next));
@@ -127,7 +133,7 @@ exports.app.post('actiontypes/:actiontype_id', function (req, res, next) {
     // if actiontype_id in the url is the empty string, use undefined instead
     var actiontype_id = req.params.actiontype_id || undefined;
     var _a = req.body, name = _a.name, view_order = _a.view_order, archived = _a.archived, deleted = _a.deleted;
-    database_1.default.InsertOne('actiontype')
+    exports.db.InsertOne('actiontype')
         .set({ actiontype_id: actiontype_id, name: name, view_order: view_order, archived: archived, deleted: deleted })
         .returning('*')
         .execute(sendCallback(res, next)); // HTTP 201
@@ -136,7 +142,7 @@ exports.app.post('actiontypes/:actiontype_id', function (req, res, next) {
 Show existing actiontype.
 */
 exports.app.get('actiontypes/:actiontype_id', function (req, res, next) {
-    database_1.default.SelectOne('distinct_actiontype')
+    exports.db.SelectOne('distinct_actiontype')
         .whereEqual({ actiontype_id: req.params.actiontype_id })
         .where('deleted IS NULL')
         .execute(sendCallback(res, next));
@@ -145,7 +151,7 @@ exports.app.get('actiontypes/:actiontype_id', function (req, res, next) {
 Delete existing actiontype.
 */
 exports.app.del('actiontypes/:actiontype_id', function (req, res, next) {
-    database_1.default.Insert('actiontype')
+    exports.db.Insert('actiontype')
         .set({ actiontype_id: req.params.actiontype_id, deleted: new Date() })
         .execute(sendCallback(res, next)); // HTTP 204
 });

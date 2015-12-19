@@ -1,6 +1,14 @@
 import {join} from 'path';
 import {createServer, bodyParser, queryParser, CORS, Response, Next} from 'restify';
-import db from './database';
+import {Connection} from 'sqlcmd-pg';
+
+export const db = new Connection({
+  host: '127.0.0.1',
+  port: '5432',
+  user: 'postgres',
+  database: 'metry',
+});
+
 var package_json = require('./package.json');
 
 export const app = createServer();
