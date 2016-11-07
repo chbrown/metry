@@ -1,8 +1,9 @@
-var restify_1 = require('restify');
-var sqlcmd_pg_1 = require('sqlcmd-pg');
+"use strict";
+const restify_1 = require('restify');
+const sqlcmd_pg_1 = require('sqlcmd-pg');
 exports.db = new sqlcmd_pg_1.Connection({
     host: '127.0.0.1',
-    port: '5432',
+    port: 5432,
     user: 'postgres',
     database: 'metry',
 });
@@ -20,7 +21,7 @@ function parseDate(text) {
     return isNaN(date.getTime()) ? null : date;
 }
 function sendCallback(res, next) {
-    return function (error, result) {
+    return (error, result) => {
         if (error) {
             return next(error);
         }
@@ -35,7 +36,7 @@ function sendCallback(res, next) {
 /** GET /info
 Show metry package metadata
 */
-exports.app.get('info', function (req, res, next) {
+exports.app.get('info', (req, res, next) => {
     res.send({
         name: package_json.name,
         version: package_json.version,
@@ -51,13 +52,13 @@ exports.app.get('info', function (req, res, next) {
 /** GET /actions
 List all actions.
 */
-exports.app.get('actions', function (req, res, next) {
-    var select = exports.db.Select('distinct_action').where('deleted IS NULL');
-    var start = parseDate(req.params.start);
+exports.app.get('actions', (req, res, next) => {
+    let select = exports.db.Select('distinct_action').where('deleted IS NULL');
+    let start = parseDate(req.params.start);
     if (start) {
         select = select.where('started > ?', start);
     }
-    var end = parseDate(req.params.end);
+    let end = parseDate(req.params.end);
     if (end) {
         select = select.where('ended < ?', end);
     }
@@ -66,7 +67,7 @@ exports.app.get('actions', function (req, res, next) {
 /** GET /actions/new
 Generate blank action.
 */
-exports.app.get('actions/new', function (req, res, next) {
+exports.app.get('actions/new', (req, res, next) => {
     res.send({ entered: new Date() });
     next();
 });
@@ -76,20 +77,20 @@ exports.app.get('actions/new', function (req, res, next) {
 Create / update action.
 It's basically the same thing since the `action` table is immutable.
 */
-exports.app.post('actions/:action_id', function (req, res, next) {
+exports.app.post('actions/:action_id', (req, res, next) => {
     // the action_id supplied in the URL should override the payload, even if undefined
     // if it's the empty string, use undefined instead
-    var action_id = req.params.action_id || undefined;
-    var _a = req.body, actiontype_id = _a.actiontype_id, started = _a.started, ended = _a.ended, deleted = _a.deleted;
+    let action_id = req.params.action_id || undefined;
+    let { actiontype_id, started, ended, deleted } = req.body;
     exports.db.InsertOne('action')
-        .set({ action_id: action_id, actiontype_id: actiontype_id, started: started, ended: ended, deleted: deleted })
+        .set({ action_id, actiontype_id, started, ended, deleted })
         .returning('*')
         .execute(sendCallback(res, next)); // HTTP 201
 });
 /** GET /actions/:action_id
 Show existing action.
 */
-exports.app.get('actions/:action_id', function (req, res, next) {
+exports.app.get('actions/:action_id', (req, res, next) => {
     exports.db.SelectOne('action')
         .whereEqual({ action_id: req.params.action_id })
         .orderBy('entered DESC')
@@ -99,7 +100,7 @@ exports.app.get('actions/:action_id', function (req, res, next) {
 /** DELETE /actions/:action_id
 Delete existing action.
 */
-exports.app.del('actions/:action_id', function (req, res, next) {
+exports.app.del('actions/:action_id', (req, res, next) => {
     exports.db.Insert('action')
         .set({ action_id: req.params.action_id, deleted: new Date() })
         .execute(sendCallback(res, next)); // HTTP 204
@@ -110,7 +111,7 @@ exports.app.del('actions/:action_id', function (req, res, next) {
 /** GET /actiontypes
 List all actiontypes.
 */
-exports.app.get('actiontypes', function (req, res, next) {
+exports.app.get('actiontypes', (req, res, next) => {
     exports.db.Select('distinct_actiontype')
         .where('deleted IS NULL')
         .orderBy('view_order ASC, actiontype_id ASC')
@@ -119,7 +120,7 @@ exports.app.get('actiontypes', function (req, res, next) {
 /** GET /actiontypes/new
 Generate blank actiontype.
 */
-exports.app.get('actiontypes/new', function (req, res, next) {
+exports.app.get('actiontypes/new', (req, res, next) => {
     res.send({ entered: new Date() });
     next();
 });
@@ -129,19 +130,19 @@ exports.app.get('actiontypes/new', function (req, res, next) {
 Create / update actiontypes.
 It's basically the same thing since the `actiontype` table is immutable.
 */
-exports.app.post('actiontypes/:actiontype_id', function (req, res, next) {
+exports.app.post('actiontypes/:actiontype_id', (req, res, next) => {
     // if actiontype_id in the url is the empty string, use undefined instead
-    var actiontype_id = req.params.actiontype_id || undefined;
-    var _a = req.body, name = _a.name, view_order = _a.view_order, archived = _a.archived, deleted = _a.deleted;
+    let actiontype_id = req.params.actiontype_id || undefined;
+    let { name, view_order, archived, deleted } = req.body;
     exports.db.InsertOne('actiontype')
-        .set({ actiontype_id: actiontype_id, name: name, view_order: view_order, archived: archived, deleted: deleted })
+        .set({ actiontype_id, name, view_order, archived, deleted })
         .returning('*')
         .execute(sendCallback(res, next)); // HTTP 201
 });
 /** GET /actiontypes/:actiontype_id
 Show existing actiontype.
 */
-exports.app.get('actiontypes/:actiontype_id', function (req, res, next) {
+exports.app.get('actiontypes/:actiontype_id', (req, res, next) => {
     exports.db.SelectOne('distinct_actiontype')
         .whereEqual({ actiontype_id: req.params.actiontype_id })
         .where('deleted IS NULL')
@@ -150,14 +151,14 @@ exports.app.get('actiontypes/:actiontype_id', function (req, res, next) {
 /** DELETE /actiontypes/:actiontype_id
 Delete existing actiontype.
 */
-exports.app.del('actiontypes/:actiontype_id', function (req, res, next) {
+exports.app.del('actiontypes/:actiontype_id', (req, res, next) => {
     exports.db.Insert('actiontype')
         .set({ actiontype_id: req.params.actiontype_id, deleted: new Date() })
         .execute(sendCallback(res, next)); // HTTP 204
 });
-exports.app.on('listening', function () {
+exports.app.on('listening', () => {
     var address = exports.app.address();
-    console.log("server listening on http://" + address.address + ":" + address.port);
+    console.log(`server listening on http://${address.address}:${address.port}`);
 });
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = exports.app;
