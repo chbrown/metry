@@ -13,11 +13,10 @@
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "license": "MIT",
   "dependencies": {
-    "moment": "*",
-    "restify": "*",
-    "sql-patch": "*",
-    "sqlcmd-pg": "*",
-    "yargs": "*"
+    "optimist": "0.6.1",
+    "restify": "4.2.0",
+    "sql-patch": "0.1.6",
+    "sqlcmd-pg": "1.1.2"
   },
   "devDependencies": {
     "declarations": "*",
