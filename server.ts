@@ -1,6 +1,8 @@
 import {join} from 'path'
+import * as optimist from 'optimist'
 import {createServer, bodyParser, queryParser, CORS, Response, Next} from 'restify'
 import {Connection} from 'sqlcmd-pg'
+const sqlPatch = require('sql-patch')
 
 export const db = new Connection({
   host: '127.0.0.1',
@@ -9,7 +11,7 @@ export const db = new Connection({
   database: 'metry',
 })
 
-var package_json = require('./package.json')
+const package_json = require('./package.json')
 
 export const app = createServer()
 
@@ -22,7 +24,7 @@ app.use(bodyParser({mapParams: false}))
 Simple date parser, but returns null for invalid input.
 */
 function parseDate(text: string): Date {
-  var date = new Date(text)
+  const date = new Date(text)
   return isNaN(date.getTime()) ? null : date
 }
 
@@ -173,8 +175,56 @@ app.del('actiontypes/:actiontype_id', (req, res, next) => {
 })
 
 app.on('listening', () => {
-  var address = app.address()
+  const address = app.address()
   console.log(`server listening on http://${address.address}:${address.port}`)
 })
 
-export default app
+function main() {
+  const argvparser = optimist
+    .describe({
+      hostname: 'hostname to listen on',
+      port: 'port to listen on',
+      help: 'print this help message',
+      verbose: 'print extra output',
+      version: 'print version',
+    })
+    .boolean([
+      'help',
+      'verbose',
+      'version',
+    ])
+    .alias({
+      v: 'verbose',
+    })
+    .default({
+      hostname: process.env.HOSTNAME || '127.0.0.1',
+      port: parseInt(process.env.PORT) || 80,
+      verbose: process.env.DEBUG !== undefined,
+    })
+
+  const argv = argvparser.argv
+
+  if (argv.help) {
+    argvparser.showHelp()
+  }
+  else if (argv.version) {
+    console.log(package_json.version)
+  }
+  else {
+    console.info('starting metry server; initializing database if needed')
+    db.createDatabaseIfNotExists(err => {
+      if (err) throw err
+
+      const patches_dirpath = join(__dirname, 'schema')
+      sqlPatch.executePatches(db, '_schema_patches', patches_dirpath, err => {
+        if (err) throw err
+
+        app.listen(argv.port, argv.hostname)
+      })
+    })
+  }
+}
+
+if (require.main === module) {
+  main()
+}
