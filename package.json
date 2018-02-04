@@ -26,6 +26,8 @@
     "metry": "bin/metry"
   },
   "scripts": {
-    "start": "node bin/metry"
+    "prepare": "tsc",
+    "start": "node bin/metry",
+    "clean": "tsc --listEmittedFiles | sed 's/^TSFILE: //' | xargs rm -v"
   }
 }
