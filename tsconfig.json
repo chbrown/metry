@@ -4,9 +4,6 @@
     "target": "ES6"
   },
   "files": [
-    "node_modules/declarations/node/node.d.ts",
-    "node_modules/declarations/pg/pg.d.ts",
-    "node_modules/declarations/restify/restify.d.ts",
     "server.ts"
   ]
 }
