@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-var path = require('path');
-var sqlPatch = require('sql-patch');
-var server = require('../server');
+var path = require('path')
+var sqlPatch = require('sql-patch')
+var server = require('../server')
 
 var argvparser = require('optimist')
   .describe({
@@ -23,26 +23,26 @@ var argvparser = require('optimist')
     hostname: process.env.HOSTNAME || '127.0.0.1',
     port: parseInt(process.env.PORT) || 80,
     verbose: process.env.DEBUG !== undefined,
-  });
+  })
 
-var argv = argvparser.argv;
+var argv = argvparser.argv
 
 if (argv.help) {
-  argvparser.showHelp();
+  argvparser.showHelp()
 }
 else if (argv.version) {
-  console.log(require('../package').version);
+  console.log(require('../package').version)
 }
 else {
-  console.info('starting metry server; initializing database if needed');
+  console.info('starting metry server initializing database if needed')
   server.db.createDatabaseIfNotExists(function(err) {
-    if (err) throw err;
+    if (err) throw err
 
-    var patches_dirpath = path.join(__dirname, '..', 'schema');
+    var patches_dirpath = path.join(__dirname, '..', 'schema')
     sqlPatch.executePatches(server.db, '_schema_patches', patches_dirpath, function(err) {
-      if (err) throw err;
+      if (err) throw err
 
-      server.default.listen(argv.port, argv.hostname);
-    });
-  });
+      server.default.listen(argv.port, argv.hostname)
+    })
+  })
 }
