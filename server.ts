@@ -2,7 +2,7 @@ import {join} from 'path'
 import * as optimist from 'optimist'
 import {createServer, bodyParser, queryParser, CORS, Response, Next} from 'restify'
 import {Connection} from 'sqlcmd-pg'
-const sqlPatch = require('sql-patch')
+import {executePatches} from 'sql-patch'
 
 export const db = new Connection({
   host: '127.0.0.1',
@@ -216,7 +216,7 @@ function main() {
       if (err) throw err
 
       const patches_dirpath = join(__dirname, 'schema')
-      sqlPatch.executePatches(db, '_schema_patches', patches_dirpath, err => {
+      executePatches(db, '_schema_patches', patches_dirpath, err => {
         if (err) throw err
 
         app.listen(argv.port, argv.hostname)
