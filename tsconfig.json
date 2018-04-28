@@ -2,8 +2,5 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "ES6"
-  },
-  "files": [
-    "server.ts"
-  ]
+  }
 }
