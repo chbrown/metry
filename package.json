@@ -22,10 +22,14 @@
     "@types/node": "^9.6.7",
     "@types/optimist": "^0.0.29",
     "@types/restify": "^4.3.6",
+    "ajv": "^6.4.0",
+    "ava": "^1.0.0-beta.4",
     "typescript": "^2.8.3"
   },
   "scripts": {
     "prepare": "tsc",
+    "pretest": "tsc",
+    "test": "ava",
     "clean": "tsc --listEmittedFiles | sed 's/^TSFILE: //' | xargs rm -v"
   }
 }
