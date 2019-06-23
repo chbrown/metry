@@ -176,7 +176,8 @@ app.del('actiontypes/:actiontype_id', (req, res, next) => {
 
 app.on('listening', () => {
   const address = app.address()
-  console.log(`server listening on http://${address.address}:${address.port}`)
+  const addressString = typeof address == 'string' ? address : `${address.address}:${address.port}`
+  console.log(`server listening on http://${addressString}`)
 })
 
 function main() {
