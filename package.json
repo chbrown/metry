@@ -24,12 +24,15 @@
     "@types/restify": "^4.3.6",
     "ajv": "^6.4.0",
     "ava": "^1.0.0-beta.4",
+    "coveralls": "^3.0.4",
+    "nyc": "^14.1.1",
     "typescript": "^2.8.3"
   },
   "scripts": {
     "prepare": "tsc",
     "pretest": "tsc",
-    "test": "ava",
+    "test": "nyc ava",
+    "posttest": "nyc report --reporter=text-lcov | coveralls || true",
     "clean": "tsc --listEmittedFiles | sed 's/^TSFILE: //' | xargs rm -v"
   }
 }
