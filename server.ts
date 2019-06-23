@@ -65,11 +65,11 @@ List all actions.
 app.get('actions', (req, res, next) => {
   let select = db.Select('distinct_action').where('deleted IS NULL')
 
-  let start = parseDate(req.params.start)
+  const start = parseDate(req.params.start)
   if (start) {
     select = select.where('started > ?', start)
   }
-  let end = parseDate(req.params.end)
+  const end = parseDate(req.params.end)
   if (end) {
     select = select.where('ended < ?', end)
   }
@@ -92,8 +92,8 @@ It's basically the same thing since the `action` table is immutable.
 app.post('actions/:action_id', (req, res, next) => {
   // the action_id supplied in the URL should override the payload, even if undefined
   // if it's the empty string, use undefined instead
-  let action_id = req.params.action_id || undefined
-  let {actiontype_id, started, ended, deleted} = req.body
+  const action_id = req.params.action_id || undefined
+  const {actiontype_id, started, ended, deleted} = req.body
 
   db.InsertOne('action')
   .set({action_id, actiontype_id, started, ended, deleted})
@@ -148,8 +148,8 @@ It's basically the same thing since the `actiontype` table is immutable.
 */
 app.post('actiontypes/:actiontype_id', (req, res, next) => {
   // if actiontype_id in the url is the empty string, use undefined instead
-  let actiontype_id = req.params.actiontype_id || undefined
-  let {name, view_order, archived, deleted} = req.body
+  const actiontype_id = req.params.actiontype_id || undefined
+  const {name, view_order, archived, deleted} = req.body
 
   db.InsertOne('actiontype')
   .set({actiontype_id, name, view_order, archived, deleted})
@@ -199,7 +199,7 @@ function main() {
     })
     .default({
       hostname: process.env.HOSTNAME || '127.0.0.1',
-      port: parseInt(process.env.PORT) || 80,
+      port: parseInt(process.env.PORT, 10) || 80,
       verbose: process.env.DEBUG !== undefined,
     })
 
@@ -213,12 +213,12 @@ function main() {
   }
   else {
     console.info('starting metry server; initializing database if needed')
-    db.createDatabaseIfNotExists(err => {
-      if (err) throw err
+    db.createDatabaseIfNotExists(createErr => {
+      if (createErr) throw createErr
 
       const patches_dirpath = join(__dirname, 'schema')
-      executePatches(db, '_schema_patches', patches_dirpath, err => {
-        if (err) throw err
+      executePatches(db, '_schema_patches', patches_dirpath, patchErr => {
+        if (patchErr) throw patchErr
 
         app.listen(argv.port, argv.hostname)
       })
