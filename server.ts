@@ -96,29 +96,28 @@ app.post('actions/:action_id', (req, res, next) => {
   const {actiontype_id, started, ended, deleted} = req.body
 
   db.InsertOne('action')
-  .set({action_id, actiontype_id, started, ended, deleted})
-  .returning('*')
-  .execute(sendCallback(res, next)) // HTTP 201
+    .set({action_id, actiontype_id, started, ended, deleted})
+    .returning('*')
+    .execute(sendCallback(res, next)) // HTTP 201
 })
 /** GET /actions/:action_id
 Show existing action.
 */
 app.get('actions/:action_id', (req, res, next) => {
   db.SelectOne('action')
-  .whereEqual({action_id: req.params.action_id})
-  .orderBy('entered DESC')
-  .where('deleted IS NULL')
-  .execute(sendCallback(res, next))
+    .whereEqual({action_id: req.params.action_id})
+    .orderBy('entered DESC')
+    .where('deleted IS NULL')
+    .execute(sendCallback(res, next))
 })
 /** DELETE /actions/:action_id
 Delete existing action.
 */
 app.del('actions/:action_id', (req, res, next) => {
   db.Insert('action')
-  .set({action_id: req.params.action_id, deleted: new Date()})
-  .execute(sendCallback(res, next)) // HTTP 204
+    .set({action_id: req.params.action_id, deleted: new Date()})
+    .execute(sendCallback(res, next)) // HTTP 204
 })
-
 
 /*******************************************************************************
                                 actiontypes
@@ -129,9 +128,9 @@ List all actiontypes.
 */
 app.get('actiontypes', (req, res, next) => {
   db.Select('distinct_actiontype')
-  .where('deleted IS NULL')
-  .orderBy('view_order ASC, actiontype_id ASC')
-  .execute(sendCallback(res, next))
+    .where('deleted IS NULL')
+    .orderBy('view_order ASC, actiontype_id ASC')
+    .execute(sendCallback(res, next))
 })
 /** GET /actiontypes/new
 Generate blank actiontype.
@@ -152,26 +151,26 @@ app.post('actiontypes/:actiontype_id', (req, res, next) => {
   const {name, view_order, archived, deleted} = req.body
 
   db.InsertOne('actiontype')
-  .set({actiontype_id, name, view_order, archived, deleted})
-  .returning('*')
-  .execute(sendCallback(res, next)) // HTTP 201
+    .set({actiontype_id, name, view_order, archived, deleted})
+    .returning('*')
+    .execute(sendCallback(res, next)) // HTTP 201
 })
 /** GET /actiontypes/:actiontype_id
 Show existing actiontype.
 */
 app.get('actiontypes/:actiontype_id', (req, res, next) => {
   db.SelectOne('distinct_actiontype')
-  .whereEqual({actiontype_id: req.params.actiontype_id})
-  .where('deleted IS NULL')
-  .execute(sendCallback(res, next))
+    .whereEqual({actiontype_id: req.params.actiontype_id})
+    .where('deleted IS NULL')
+    .execute(sendCallback(res, next))
 })
 /** DELETE /actiontypes/:actiontype_id
 Delete existing actiontype.
 */
 app.del('actiontypes/:actiontype_id', (req, res, next) => {
   db.Insert('actiontype')
-  .set({actiontype_id: req.params.actiontype_id, deleted: new Date()})
-  .execute(sendCallback(res, next)) // HTTP 204
+    .set({actiontype_id: req.params.actiontype_id, deleted: new Date()})
+    .execute(sendCallback(res, next)) // HTTP 204
 })
 
 app.on('listening', () => {
@@ -189,11 +188,7 @@ function main() {
       verbose: 'print extra output',
       version: 'print version',
     })
-    .boolean([
-      'help',
-      'verbose',
-      'version',
-    ])
+    .boolean(['help', 'verbose', 'version'])
     .alias({
       v: 'verbose',
     })
@@ -207,11 +202,9 @@ function main() {
 
   if (argv.help) {
     argvparser.showHelp()
-  }
-  else if (argv.version) {
+  } else if (argv.version) {
     console.log(package_json.version)
-  }
-  else {
+  } else {
     console.info('starting metry server; initializing database if needed')
     db.createDatabaseIfNotExists(createErr => {
       if (createErr) throw createErr
