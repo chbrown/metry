@@ -14,13 +14,13 @@
   "license": "MIT",
   "dependencies": {
     "optimist": "^0.6.1",
-    "restify": "^4.3.4",
-    "sql-patch": "1.2.2",
-    "sqlcmd-pg": "3.0.2"
+    "pg": "^7.17.1",
+    "restify": "^4.3.4"
   },
   "devDependencies": {
     "@types/node": "^13.5.0",
     "@types/optimist": "^0.0.29",
+    "@types/pg": "^7.14.1",
     "@types/restify": "^4.3.6",
     "ajv": "^6.11.0",
     "ava": "^3.1.0",
