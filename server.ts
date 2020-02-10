@@ -99,9 +99,16 @@ app.post('/actions/:action_id', (req, res, next) => {
   // if it's the empty string, use undefined instead
   const action_id = req.params.action_id || undefined
   const {actiontype_id, started, ended, deleted} = req.body
+  // this wouldn't require the COALESCE(..., next(...)) if we could easily
+  // exclude the action_id from the insertion when it is NULL
   pool.query(
     `INSERT INTO action (action_id, actiontype_id, started, ended, deleted)
-     VALUES ($1, $2, $3, $4, $5)
+     VALUES (
+       COALESCE($1, nextval('action_action_id_seq')),
+       $2,
+       $3,
+       $4,
+       $5)
      RETURNING *`,
     [action_id, actiontype_id, started, ended, deleted],
     (err, result) => {
@@ -196,7 +203,12 @@ app.post('/actiontypes/:actiontype_id', (req, res, next) => {
   const {name, view_order, archived, deleted} = req.body
   pool.query(
     `INSERT INTO actiontype (actiontype_id, name, view_order, archived, deleted)
-     VALUES ($1, $2, $3, $4, $5)
+     VALUES (
+       COALESCE($1, nextval('actiontype_actiontype_id_seq')),
+       $2,
+       COALESCE($3, 0),
+       COALESCE($4, FALSE),
+       $5)
      RETURNING *`,
     [actiontype_id, name, view_order, archived, deleted],
     (err, result) => {
