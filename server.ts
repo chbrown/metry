@@ -2,7 +2,8 @@ import {join} from 'path'
 
 import * as optimist from 'optimist'
 import {Pool} from 'pg'
-import {createServer, bodyParser, queryParser, CORS, Response, Next} from 'restify'
+import {createServer, Response, Next, plugins} from 'restify'
+import * as corsMiddleware from 'restify-cors-middleware'
 
 import {createDatabase, executePatches, initializeDatabase} from './database'
 
@@ -18,10 +19,17 @@ const package_json = require('./package.json')
 
 export const app = createServer()
 
-app.use(CORS())
-app.use(queryParser())
-// keep req.params and req.body distinct, so that we can distingush between POST and url params
-app.use(bodyParser({mapParams: false}))
+// CORS
+const cors = corsMiddleware({
+  origins: ['http://localhost', 'https://localhost'],
+  allowHeaders: [],
+  exposeHeaders: [],
+})
+app.pre(cors.preflight)
+app.use(cors.actual)
+// restify plugins
+app.use(plugins.queryParser({mapParams: true}))
+app.use(plugins.bodyParser())
 
 /**
 Simple date parser, but returns null for invalid input.
@@ -34,7 +42,7 @@ function parseDate(text: string): Date {
 /** GET /info
 Show metry package metadata
 */
-app.get('info', (req, res, next) => {
+app.get('/info', (req, res, next) => {
   res.send({
     name: package_json.name,
     version: package_json.version,
@@ -51,7 +59,7 @@ app.get('info', (req, res, next) => {
 /** GET /actions
 List all actions.
 */
-app.get('actions', (req, res, next) => {
+app.get('/actions', (req, res, next) => {
   const start = parseDate(req.params.start)
   const end = parseDate(req.params.end)
   pool.query(
@@ -76,7 +84,7 @@ app.get('actions', (req, res, next) => {
 /** GET /actions/new
 Generate blank action.
 */
-app.get('actions/new', (req, res, next) => {
+app.get('/actions/new', (req, res, next) => {
   res.send({entered: new Date()})
   next()
 })
@@ -86,7 +94,7 @@ app.get('actions/new', (req, res, next) => {
 Create / update action.
 It's basically the same thing since the `action` table is immutable.
 */
-app.post('actions/:action_id', (req, res, next) => {
+app.post('/actions/:action_id', (req, res, next) => {
   // the action_id supplied in the URL should override the payload, even if undefined
   // if it's the empty string, use undefined instead
   const action_id = req.params.action_id || undefined
@@ -109,7 +117,7 @@ app.post('actions/:action_id', (req, res, next) => {
 /** GET /actions/:action_id
 Show existing action.
 */
-app.get('actions/:action_id', (req, res, next) => {
+app.get('/actions/:action_id', (req, res, next) => {
   pool.query(
     `SELECT * FROM action
      WHERE deleted IS NULL
@@ -128,7 +136,7 @@ app.get('actions/:action_id', (req, res, next) => {
 /** DELETE /actions/:action_id
 Delete existing action.
 */
-app.del('actions/:action_id', (req, res, next) => {
+app.del('/actions/:action_id', (req, res, next) => {
   pool.query(
     `INSERT INTO action (action_id, deleted)
      VALUES ($1, $2)`,
@@ -151,7 +159,7 @@ app.del('actions/:action_id', (req, res, next) => {
 /** GET /actiontypes
 List all actiontypes.
 */
-app.get('actiontypes', (req, res, next) => {
+app.get('/actiontypes', (req, res, next) => {
   pool.query(
     `SELECT * FROM distinct_actiontype
      WHERE deleted IS NULL
@@ -172,7 +180,7 @@ app.get('actiontypes', (req, res, next) => {
 /** GET /actiontypes/new
 Generate blank actiontype.
 */
-app.get('actiontypes/new', (req, res, next) => {
+app.get('/actiontypes/new', (req, res, next) => {
   res.send({entered: new Date()})
   next()
 })
@@ -182,7 +190,7 @@ app.get('actiontypes/new', (req, res, next) => {
 Create / update actiontypes.
 It's basically the same thing since the `actiontype` table is immutable.
 */
-app.post('actiontypes/:actiontype_id', (req, res, next) => {
+app.post('/actiontypes/:actiontype_id', (req, res, next) => {
   // if actiontype_id in the url is the empty string, use undefined instead
   const actiontype_id = req.params.actiontype_id || undefined
   const {name, view_order, archived, deleted} = req.body
@@ -204,7 +212,7 @@ app.post('actiontypes/:actiontype_id', (req, res, next) => {
 /** GET /actiontypes/:actiontype_id
 Show existing actiontype.
 */
-app.get('actiontypes/:actiontype_id', (req, res, next) => {
+app.get('/actiontypes/:actiontype_id', (req, res, next) => {
   pool.query(
     `SELECT * FROM distinct_actiontype
      WHERE deleted IS NULL
@@ -223,7 +231,7 @@ app.get('actiontypes/:actiontype_id', (req, res, next) => {
 /** DELETE /actiontypes/:actiontype_id
 Delete existing actiontype.
 */
-app.del('actiontypes/:actiontype_id', (req, res, next) => {
+app.del('/actiontypes/:actiontype_id', (req, res, next) => {
   pool.query(
     `INSERT INTO actiontype (actiontype_id, deleted)
      VALUES ($1, $2)`,
