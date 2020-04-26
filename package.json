@@ -6,10 +6,7 @@
     "metrics"
   ],
   "homepage": "https://github.com/chbrown/metry",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/chbrown/metry.git"
-  },
+  "repository": "github:chbrown/metry",
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "license": "MIT",
   "dependencies": {
