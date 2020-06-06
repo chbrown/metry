@@ -3,9 +3,9 @@ import {join} from 'path'
 import * as optimist from 'optimist'
 import {Pool} from 'pg'
 import {createServer, Response, Next, plugins} from 'restify'
-import * as corsMiddleware from 'restify-cors-middleware'
 
 import {createDatabase, executePatches, initializeDatabase} from './database'
+import {corsPreflight, corsHandler} from './middleware'
 
 const PG_CONFIG = {
   user: 'postgres',
@@ -20,13 +20,8 @@ const package_json = require('./package.json')
 export const app = createServer()
 
 // CORS
-const cors = corsMiddleware({
-  origins: ['http://localhost', 'https://localhost'],
-  allowHeaders: [],
-  exposeHeaders: [],
-})
-app.pre(cors.preflight)
-app.use(cors.actual)
+app.pre(corsPreflight)
+app.use(corsHandler)
 // restify plugins
 app.use(plugins.queryParser({mapParams: true}))
 app.use(plugins.bodyParser())

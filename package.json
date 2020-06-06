@@ -12,15 +12,13 @@
   "dependencies": {
     "optimist": "^0.6.1",
     "pg": "^8.0.3",
-    "restify": "^8.5.1",
-    "restify-cors-middleware": "^1.1.1"
+    "restify": "^8.5.1"
   },
   "devDependencies": {
     "@types/node": "^13.13.3",
     "@types/optimist": "^0.0.29",
     "@types/pg": "^7.14.3",
     "@types/restify": "^8.4.2",
-    "@types/restify-cors-middleware": "^1.0.1",
     "@types/restify-plugins": "^1.5.12",
     "ajv": "^6.12.2",
     "ava": "^3.8.0",
