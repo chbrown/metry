@@ -19,7 +19,6 @@
     "@types/optimist": "^0.0.29",
     "@types/pg": "^7.14.3",
     "@types/restify": "^8.4.2",
-    "@types/restify-plugins": "^1.5.12",
     "ajv": "^6.12.2",
     "ava": "^3.8.0",
     "coveralls": "^3.1.0",
