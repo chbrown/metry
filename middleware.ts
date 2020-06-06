@@ -14,7 +14,7 @@ CORS-safelisted response headers:
 const PREFLIGHT_MAX_AGE = 86400 // = 24 hours
 const CREDENTIALS = false
 const ORIGINS = new Set(['http://localhost', 'https://localhost'])
-const ALLOW_HEADERS = ['User-Agent', 'X-Requested-With', 'Range']
+const ALLOW_HEADERS = ['Content-Type', 'User-Agent', 'X-Requested-With', 'Range']
 const EXPOSE_HEADERS = ['Content-Range', 'Date']
 
 export function corsPreflight(req: Request, res: Response, next: Next) {
